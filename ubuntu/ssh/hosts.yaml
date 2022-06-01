@@ -1,0 +1,10 @@
+[servers:vars]
+
+ansible_connection=ssh
+ansible_ssh_user=
+ansible_password=
+ansible_sudo_pass=
+
+[servers]
+
+myhostname ansible_host=

@@ -1,0 +1,40 @@
+- name: Add user if not exist and deploy ssh keys and config on host.
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Install user if is not exist
+      user:
+        name: "{{ username }}"
+        comment: "{{ fullname }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        ## run command 'mkpasswd --method=sha-512' to create your own encrypted password ##
+        password: $6$AfVMZ4rkW8d74JO$VKSP2qf.ahLQxDhs.xfldyuSXsWKu/07Hy.1cIqWHThE16kOYOyW8LVzAD13T8IMU0MIboHPMUjWGlTt8xEmj/
+
+    - name: Make sure that user exists
+      user:
+        name: "{{ username }}"
+        state: present
+
+    - name: Copying the user key to the server
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        manage_dir: yes
+        key: "{{ lookup('file', 'src/yakunin.key.pub') }}"
+
+    - name: Copy the ssh configuration to the directory
+      template:
+        src: src/sshd_config
+        dest: /etc/ssh/sshd_config
+        owner: root
+        mode: '0600'
+        validate: /usr/sbin/sshd -t -f %s
+
+    - name: Restart ssh server
+      service:
+        name: sshd
+        state: restarted
