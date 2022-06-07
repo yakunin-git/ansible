@@ -1,0 +1,48 @@
+- name: Update apt source.
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all packages on host.
+  apt: upgrade=dist force_apt_get=yes
+
+- name: Install user if is not exist
+  user:
+    name: '{{username}}'
+    comment: '{{fullname}}'
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+    ## run command 'mkpasswd --method=sha-512' to create your own encrypted password ##
+    password: $6$AfVMZ4rkW8d74JO$VKSP2qf.ahLQxDhs.xfldyuSXsWKu/07Hy.1cIqWHThE16kOYOyW8LVzAD13T8IMU0MIboHPMUjWGlTt8xEmj/
+
+- name: Make sure that user exists
+  user:
+    name: '{{username}}'
+    state: present
+
+- name: Copy templates to non root user '{{ username}}'
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '/home/{{ username }}/{{ item.dest }}'
+    owner: '{{ username }}'
+    group: '{{ username }}'
+    mode: '0644'
+  with_items:
+    - { src: 'templates/non_root_bashrc.template', dest: '.bashrc' }
+    - { src: 'templates/non_root_profile.template', dest: '.profile' }
+
+- name: Add '{{ username }}' to sudo without password.
+  copy:
+    content: '{{ username }} ALL=(ALL) NOPASSWD:ALL'
+    dest: /etc/sudoers.d/{{ username }}
+    mode: 0440
+
+- name: Copy templates to root user
+  ansible.builtin.copy:
+    src: '{{ item.src }}'
+    dest: '/root/{{ item.dest }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  with_items:
+    - { src: 'templates/root_bashrc.template', dest: '.bashrc' }
+    - { src: 'templates/root_profile.template', dest: '.profile' }

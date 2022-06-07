@@ -1,0 +1,9 @@
+[servers:vars]
+
+ansible_connection=ssh
+ansible_ssh_user=
+ansible_sudo_pass=
+
+[servers]
+
+127.0.0.1 ansible_host= ansible_ssh_port=

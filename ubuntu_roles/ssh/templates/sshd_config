@@ -1,0 +1,18 @@
+Port 2211
+ListenAddress 0.0.0.0
+
+LoginGraceTime 1m
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 2
+MaxSessions 5
+
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM no
+X11Forwarding no
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem sftp	/usr/lib/openssh/sftp-server

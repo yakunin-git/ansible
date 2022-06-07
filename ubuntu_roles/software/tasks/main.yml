@@ -1,0 +1,7 @@
+- name: Update apt source, for required software
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Installing the required software
+  ansible.builtin.package:
+    name: '{{ software_list }}'
+    state: latest

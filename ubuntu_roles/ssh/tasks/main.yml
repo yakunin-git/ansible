@@ -1,0 +1,19 @@
+- name: Copying the user key to the server
+  authorized_key:
+    user: '{{ username }}'
+    state: present
+    manage_dir: yes
+    key: "{{ lookup('file', 'templates/yakunin.key.pub') }}"
+
+- name: Copy the ssh configuration to the directory
+  template:
+    src: templates/sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    mode: '0600'
+    validate: /usr/sbin/sshd -t -f %s
+
+- name: Restart ssh server
+  service:
+    name: sshd
+    state: restarted
